@@ -1,0 +1,16 @@
+{
+  "name": "launchpoint",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "",
+  "main": "script.js",
+  "scripts": {
+    "dev": "node script.js"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.0.0",
+    "openai": "^4.61.0"
+  }
+}
