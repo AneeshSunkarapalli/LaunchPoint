@@ -5,37 +5,38 @@
   padding: 20px;
 }
 
-/* Search bar container aligned to the left */
+/* Search bar container aligned to the left and moved down slightly */
 .search-bar-results {
   display: flex;
   justify-content: flex-start;
   margin-bottom: 20px;
+  margin-top: 20px; /* Add top margin to push it below the title */
 }
 
 /* Input field for location */
 .search-bar-results input {
   padding: 10px;
   margin-right: 10px;
-  font-size: 16px;
+  font-size: 14px; /* Reduced font size for better fit */
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 200px;
+  width: 180px; /* Reduced width to better align */
 }
 
 /* Dropdowns for business type and subcategory */
 .search-bar-results select {
   padding: 10px;
   margin-right: 10px;
-  font-size: 16px;
+  font-size: 14px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 200px;
+  width: 180px; /* Reduced width */
 }
 
 /* Style for the search button */
 .search-bar-results button {
-  padding: 10px 20px;
-  font-size: 16px;
+  padding: 8px 15px;
+  font-size: 14px; /* Reduced size for better fit */
   background-color: #007bff;
   color: white;
   border: none;
@@ -62,7 +63,7 @@
 }
 
 .map-placeholder {
-  height: 400px;
+  height: 350px;
   background-color: #e0e0e0;
   display: flex;
   align-items: center;
@@ -82,21 +83,23 @@
 .rating-overall {
   text-align: center;
   background-color: #e0e0e0;
-  padding: 20px;
+  padding: 15px; /* Reduced padding to make it smaller */
   border-radius: 5px;
-  margin-bottom: 20px;
+  margin-bottom: 15px;
+  font-size: 18px; /* Adjust font size to fit more info */
 }
 
 /* Factors layout (4-grid layout) */
 .rating-factors {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 20px;
+  gap: 15px; /* Reduced gap */
 }
 
 .rating-factor {
   background-color: #e0e0e0;
-  padding: 20px;
+  padding: 15px; /* Reduced padding */
   border-radius: 5px;
   text-align: center;
+  font-size: 14px; /* Adjusted font size */
 }
