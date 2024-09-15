@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import './SearchBar.css'; // For custom styling
-import { useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { useNavigate } from 'react-router-dom';
+import axios from 'axios'; // Import axios to make API requests
 
 const SearchBar = () => {
   const [location, setLocation] = useState(''); // Location input
@@ -17,17 +18,35 @@ const SearchBar = () => {
     'Cafe/Bakery', 'Fashion/Apparel Retail', 'Grocery/Convenience', 'Health/Wellness'
   ];
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
 
-    // Redirect to /results page and pass the search data as state
-    navigate('/results', {
-      state: {
-        location,
-        category,
-        subCategory
-      }
-    });
+    // Split location into city and state
+    const [city, state] = location.split(',').map(part => part.trim());
+
+    try {
+      // Send a POST request to your backend API
+      const response = await axios.post('http://localhost:3000/api/generate-business-score', {
+        city,
+        state,
+        businessType: category,
+        cuisine: subCategory // If it's a restaurant, pass the cuisine
+      });
+
+      // Navigate to the results page and pass the response data as state
+      navigate('/results', {
+        state: {
+          city,
+          state,
+          category,
+          subCategory,
+          score: response.data.score, // Assuming OpenAI generates a score
+          factors: response.data.factors // Any other relevant data returned
+        }
+      });
+    } catch (error) {
+      console.error('Error generating score:', error);
+    }
   };
 
   return (
@@ -101,4 +120,3 @@ const SearchBar = () => {
 };
 
 export default SearchBar;
-

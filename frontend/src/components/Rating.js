@@ -1,54 +1,22 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import axios from 'axios'; // Import axios for API calls
+import axios from 'axios';
 import './Rating.css'; // Import your custom CSS
 
 const Rating = () => {
   const locationState = useLocation();
   const navigate = useNavigate();
 
-  const { location: initialLocation, category: initialCategory, subCategory: initialSubCategory } = locationState.state || {};
+  const { location: initialLocation, category: initialCategory, subCategory: initialSubCategory, score: initialScore, factors: initialFactors } = locationState.state || {};
 
   const [newLocation, setNewLocation] = useState(initialLocation || '');
   const [newCategory, setNewCategory] = useState(initialCategory || '');
   const [newSubCategory, setNewSubCategory] = useState(initialSubCategory || '');
-  const [collegeRating, setCollegeRating] = useState(null); // State for the college rating
-
-  const [submittedLocation, setSubmittedLocation] = useState(initialLocation);
-  const [submittedCategory, setSubmittedCategory] = useState(initialCategory);
-  const [submittedSubCategory, setSubmittedSubCategory] = useState(initialSubCategory);
-
-  // Fetch the college rating when the component mounts or location changes
-  useEffect(() => {
-    if (submittedLocation) {
-      const [city, state] = submittedLocation.split(',').map(part => part.trim());
-      fetchCollegeRating(city, state);
-    }
-  }, [submittedLocation]);
-
-  // Function to fetch the college rating based on city and state input
-  const fetchCollegeRating = async (city, state) => {
-    try {
-      const response = await axios.get(`http://localhost:3000/api/best-locations`, {
-        params: { city, state } // Adjust this URL if your backend is on a different port
-      });
-      console.log(response.data); // Check the data in console
-      setCollegeRating(response.data.score); // Update the college rating in state
-    } catch (error) {
-      console.error('Error fetching college rating:', error);
-    }
-  };
+  const [score, setScore] = useState(initialScore || 'Loading...');
+  const [factors, setFactors] = useState(initialFactors || ['Loading...', 'Loading...', 'Loading...', 'Loading...']);
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    setSubmittedLocation(newLocation);
-    setSubmittedCategory(newCategory);
-    setSubmittedSubCategory(newSubCategory);
-
-    // Fetch the college rating for the new location
-    const [city, state] = newLocation.split(',').map(part => part.trim());
-    fetchCollegeRating(city, state);
-
     navigate('/results', {
       state: {
         location: newLocation,
@@ -56,6 +24,30 @@ const Rating = () => {
         subCategory: newSubCategory,
       },
     });
+  };
+
+  useEffect(() => {
+    if (initialLocation && !initialScore) {
+      const [city, state] = initialLocation.split(',').map(part => part.trim());
+      fetchBusinessScore(city, state, initialCategory, initialSubCategory);
+    }
+  }, [initialLocation, initialCategory, initialScore, initialSubCategory]);
+
+  const fetchBusinessScore = async (city, state, businessType, subCategory) => {
+    try {
+      const response = await axios.post('http://localhost:3000/api/generate-business-score', {
+        city,
+        state,
+        businessType,
+        cuisine: subCategory,
+      });
+
+      const { score, factors } = response.data;
+      setScore(score);
+      setFactors(factors);
+    } catch (error) {
+      console.error('Error fetching business score:', error);
+    }
   };
 
   const getArticle = (subCategory) => {
@@ -80,26 +72,26 @@ const Rating = () => {
   };
 
   const formatLocation = (location) => {
-    if (!location) return '';
-    const [city, state] = location.split(',');
+    if (!location || typeof location !== 'string') return ''; // Prevent errors if location is undefined
+    const [city, state] = location.split(',').map(part => part.trim());
     return `${capitalizeWords(city)}, ${state.trim().toUpperCase()}`;
   };
 
   const restaurantOptions = ['African', 'American', 'Chinese', 'Indian', 'Italian', 'Japanese', 'Korean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Thai'];
   const boutiqueOptions = ['Cafe/Bakery', 'Fashion/Apparel Retail', 'Grocery/Convenience', 'Health/Wellness'];
-
+  
   return (
     <div className="results-page">
       <div className="search-bar-results">
         {/* Results Page Search Bar */}
         <form className="business-type" onSubmit={handleSearchSubmit}>
-          <input 
+          <input
             type="text"
             placeholder="Location (City, State)"
             value={newLocation}
             onChange={(e) => setNewLocation(e.target.value)}
           />
-          <select 
+          <select
             value={newCategory}
             onChange={(e) => {
               setNewCategory(e.target.value);
@@ -146,29 +138,29 @@ const Rating = () => {
         {/* Right side: Rating overview */}
         <div className="rating-container">
           <h3>
-            Overall Rating for {getArticle(submittedSubCategory)} {capitalizeWords(submittedSubCategory)} {formatCategory(submittedCategory)} in {formatLocation(submittedLocation)}
+            Overall Rating for {getArticle(newSubCategory)} {capitalizeWords(newSubCategory)} {formatCategory(newCategory)} in {formatLocation(newLocation)}
           </h3>
           <div className="rating-overall">
-            <h4>85/100</h4>
+            <h4>{score !== null ? score : 'Loading...'}</h4>
           </div>
 
           {/* Four rating factors */}
           <div className="rating-factors">
             <div className="rating-factor">
               <h5>Competition</h5>
-              <p>Description</p>
+              <p>{factors[1]}</p>
             </div>
             <div className="rating-factor">
               <h5>Popular Establishments</h5>
-              <p>Description</p>
+              <p>{factors[3]}</p>
             </div>
             <div className="rating-factor">
               <h5>Demographics</h5>
-              <p>Description</p>
+              <p>{factors[2]}</p>
             </div>
             <div className="rating-factor">
               <h5>Socio-economic Conditions</h5>
-              <p>Score: {collegeRating !== null ? collegeRating : 'Loading...'}</p>
+              <p>{factors[4]}</p>
             </div>
           </div>
         </div>

@@ -2,33 +2,24 @@
 .results-page {
   display: flex;
   flex-direction: column;
-  margin-top: 20px;
-  padding: 0 20px;
-  width: 100%;
+  padding: 20px;
 }
 
-/* Search bar container aligned to the far left */
+/* Search bar container aligned to the left */
 .search-bar-results {
   display: flex;
   justify-content: flex-start;
-  margin-top: 20px;
-  padding: 10px 0;
-  width: 100%;
+  margin-bottom: 20px;
 }
 
-.business-type {
-  display: flex;
-}
-
-/* Input field for location (fixed size) */
+/* Input field for location */
 .search-bar-results input {
   padding: 10px;
   margin-right: 10px;
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 150px; /* Shorter width for location */
-  flex-shrink: 0; /* Prevents resizing */
+  width: 200px;
 }
 
 /* Dropdowns for business type and subcategory */
@@ -38,7 +29,7 @@
   font-size: 16px;
   border-radius: 5px;
   border: 1px solid #ccc;
-  width: 200px; /* Width for the dropdowns */
+  width: 200px;
 }
 
 /* Style for the search button */
@@ -50,25 +41,21 @@
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  height: 42px;
-  margin-left: 0px; /* Bigger gap between button and dropdown */
-  display: flex;
-  align-items: center;
 }
 
 .search-bar-results button:hover {
   background-color: #0056b3;
 }
 
-/* Main content area for map and rating placeholders */
+/* Results container */
 .results-content {
   display: flex;
   justify-content: space-between;
-  padding-top: 20px;
   width: 100%;
+  padding-top: 20px;
 }
 
-/* Map container on the left side */
+/* Map container on the left */
 .map-container {
   flex: 1;
   margin-right: 20px;
@@ -77,15 +64,12 @@
 .map-placeholder {
   height: 400px;
   background-color: #e0e0e0;
-  border-radius: 5px;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 18px;
-  color: #333;
 }
 
-/* Rating container on the right side */
+/* Rating container */
 .rating-container {
   flex: 1;
   background-color: #f5f5f5;
@@ -94,20 +78,20 @@
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+/* Overall rating box */
 .rating-overall {
   text-align: center;
   background-color: #e0e0e0;
   padding: 20px;
   border-radius: 5px;
-  font-size: 24px;
   margin-bottom: 20px;
 }
 
-/* Factors section with 2x2 layout */
+/* Factors layout (4-grid layout) */
 .rating-factors {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  grid-gap: 20px;
+  gap: 20px;
 }
 
 .rating-factor {
@@ -115,5 +99,4 @@
   padding: 20px;
   border-radius: 5px;
   text-align: center;
-  font-size: 16px;
 }
