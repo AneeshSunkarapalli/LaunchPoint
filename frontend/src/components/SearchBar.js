@@ -1,14 +1,18 @@
 import React, { useState } from 'react';
 import { Form, Button, Row, Col } from 'react-bootstrap';
 import './SearchBar.css'; // For custom styling
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Add useLocation to capture state
 import axios from 'axios'; // Import axios to make API requests
 
 const SearchBar = () => {
-  const [location, setLocation] = useState(''); // Location input
-  const [category, setCategory] = useState(''); // Restaurant or Boutique/Services
-  const [subCategory, setSubCategory] = useState(''); // Subcategories (based on category)
-  const navigate = useNavigate(); // Hook for navigation
+  const navigate = useNavigate();
+  const locationState = useLocation(); // Get location state when navigating
+  const { city: initialCity = '', state: initialState = '', category: initialCategory = '', subCategory: initialSubCategory = '' } = locationState.state || {};
+
+  // Initialize state with values from navigation or set defaults
+  const [location, setLocation] = useState(`${initialCity}, ${initialState}` || ''); 
+  const [category, setCategory] = useState(initialCategory || ''); 
+  const [subCategory, setSubCategory] = useState(initialSubCategory || '');
 
   const restaurantOptions = [
     'African', 'American', 'Chinese', 'Indian', 'Italian', 'Japanese', 'Korean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Thai'
@@ -18,6 +22,7 @@ const SearchBar = () => {
     'Cafe/Bakery', 'Fashion/Apparel Retail', 'Grocery/Convenience', 'Health/Wellness'
   ];
 
+  // Handle form submission
   const handleSubmit = async (e) => {
     e.preventDefault();
 

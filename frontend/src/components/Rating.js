@@ -62,8 +62,9 @@ const Rating = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const [city, state] = newLocation.split(',').map(part => part.trim());
-
+    const locationToUse = newLocation || initialLocation;
+    const [city, state] = locationToUse.split(',').map(part => part.trim());
+  
     axios.post('http://localhost:3000/api/generate-business-score', {
       city,
       state,
@@ -75,15 +76,16 @@ const Rating = () => {
     }).catch(error => {
       console.error('Error fetching new score:', error);
     });
-
+  
     navigate('/results', {
       state: {
-        location: newLocation,
+        location: newLocation, // Keep the newLocation
         category: newCategory,
         subCategory: newSubCategory,
       },
     });
   };
+  
 
   useEffect(() => {
     if (initialLocation && !initialScore) {
@@ -136,6 +138,9 @@ const Rating = () => {
     return `${capitalizeWords(city)}, ${state.trim().toUpperCase()}`;
   };
 
+  const restaurantOptions = ['African', 'American', 'Chinese', 'Indian', 'Italian', 'Japanese', 'Korean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Thai'];
+  const boutiqueOptions = ['Cafe/Bakery', 'Fashion/Apparel Retail', 'Grocery/Convenience', 'Health/Wellness'];
+
   return (
     <div className="results-page">
       <div className="search-bar-results">
@@ -162,18 +167,21 @@ const Rating = () => {
           {newCategory === 'restaurant' && (
             <select value={newSubCategory} onChange={(e) => setNewSubCategory(e.target.value)}>
               <option value="">Select Restaurant Type</option>
-              <option value="African">African</option>
-              <option value="American">American</option>
-              <option value="Chinese">Chinese</option>
-              {/* Add more restaurant types as needed */}
+              {restaurantOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
             </select>
           )}
           {newCategory === 'boutique/services' && (
             <select value={newSubCategory} onChange={(e) => setNewSubCategory(e.target.value)}>
               <option value="">Select Boutique/Service Type</option>
-              <option value="Cafe/Bakery">Cafe/Bakery</option>
-              <option value="Fashion/Apparel Retail">Fashion/Apparel Retail</option>
-              {/* Add more boutique/services types as needed */}
+              {boutiqueOptions.map((option) => (
+                <option key={option} value={option}>
+                  {option}
+                </option>
+              ))}
             </select>
           )}
           <button type="submit">Search</button>
@@ -194,7 +202,7 @@ const Rating = () => {
             Overall Rating for {getArticle(newSubCategory)} {capitalizeWords(newSubCategory)} {formatCategory(newCategory)} in {formatLocation(newLocation)}
           </h3>
           <div className="rating-overall">
-            <h4>Score: {score !== null ? score : 'Loading...'}</h4>
+            <h4>{score !== null ? score : 'Loading...'}</h4>
           </div>
 
           {/* Four rating factors */}
