@@ -1,7 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
+import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api'; // Google Maps components
 import './Rating.css'; // Import your custom CSS
+
+const mapContainerStyle = {
+  width: '100%',
+  height: '400px',
+};
 
 const Rating = () => {
   const locationState = useLocation();
@@ -14,6 +20,45 @@ const Rating = () => {
   const [newSubCategory, setNewSubCategory] = useState(initialSubCategory || '');
   const [score, setScore] = useState(initialScore || 'Loading...');
   const [factors, setFactors] = useState(initialFactors || ['Loading...', 'Loading...', 'Loading...', 'Loading...']);
+  const [restaurants, setRestaurants] = useState([]); // To store restaurant data from Places API
+
+  const { isLoaded } = useLoadScript({
+    googleMapsApiKey: process.env.REACT_APP_GOOGLE_MAPS_API_KEY, // Make sure to set this in your .env file
+    libraries: ['places'], // Include the places library for Places API
+  });
+
+  // Fetch American restaurants if the subCategory is "American"
+  useEffect(() => {
+    if (newSubCategory === 'American') {
+      const [city, state] = newLocation.split(',').map(part => part.trim());
+      fetchAmericanRestaurants(city, state); // Fetch restaurants if "American" is selected
+    }
+  }, [newSubCategory, newLocation]);
+
+  // Function to fetch American restaurants using the Google Places API
+  const fetchAmericanRestaurants = async (city, state) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=American+restaurants+in+${city},${state}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+      );
+      setRestaurants(response.data.results); // Store the restaurant data in state
+    } catch (error) {
+      console.error('Error fetching American restaurants:', error);
+    }
+  };
+
+  // Function to render the map with markers
+  const renderMap = () => (
+    <GoogleMap
+      mapContainerStyle={mapContainerStyle}
+      zoom={12}
+      center={restaurants.length ? restaurants[0].geometry.location : { lat: 37.7749, lng: -122.4194 }} // Default to San Francisco
+    >
+      {restaurants.map((restaurant) => (
+        <Marker key={restaurant.place_id} position={restaurant.geometry.location} />
+      ))}
+    </GoogleMap>
+  );
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
@@ -137,10 +182,10 @@ const Rating = () => {
 
       {/* Main content area */}
       <div className="results-content">
-        {/* Left side: Map placeholder */}
+        {/* Left side: Map display */}
         <div className="map-container">
-          <h3>Map Placeholder</h3>
-          <div className="map-placeholder"></div>
+          <h3>Map of American Restaurants</h3>
+          {isLoaded ? renderMap() : <div>Loading Map...</div>}
         </div>
 
         {/* Right side: Rating overview */}
