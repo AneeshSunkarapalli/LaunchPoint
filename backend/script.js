@@ -1,6 +1,7 @@
 // Import required modules
 import OpenAI from 'openai';
 import dotenv from 'dotenv';
+import express from 'express';  // Add Express for routing
 
 // Load environment variables
 dotenv.config();
@@ -9,6 +10,13 @@ dotenv.config();
 const openai = new OpenAI({
   apiKey: process.env.OPENAI_API_KEY, // Make sure your API key is stored securely in the .env file
 });
+
+// Initialize Express app
+const app = express();
+const port = 3000;
+
+// Middleware to parse JSON
+app.use(express.json());
 
 // Function to get a chat completion from OpenAI using GPT-4
 async function getChatCompletion(prompt, model = "gpt-4") {
@@ -19,10 +27,11 @@ async function getChatCompletion(prompt, model = "gpt-4") {
       temperature: 0,
     });
 
-    // Output the response
-    console.log("Response:", response.choices[0].message.content);
+    // Return the response
+    return response.choices[0].message.content;
   } catch (error) {
     console.error("Error:", error);
+    throw new Error("Failed to fetch response from OpenAI");
   }
 }
 
@@ -41,14 +50,30 @@ function generatePrompt(businessType, city, state, cuisine = null) {
   return prompt;
 }
 
-// Example usage (dynamic)
-const businessType = "restaurant"; // This can be dynamic based on user input
-const cuisine = "Italian"; // Optional, only if it's a restaurant
-const city = "San Francisco";
-const state = "CA";
+// API route to handle POST request from the front end
+app.post('/api/generate-business-score', async (req, res) => {
+  const { businessType, cuisine, city, state } = req.body;
 
-// Generate the prompt based on the type of business
-const prompt = generatePrompt(businessType, city, state, cuisine);
+  // Validate input
+  if (!businessType || !city || !state) {
+    return res.status(400).json({ error: "Please provide businessType, city, and state." });
+  }
 
-// Call OpenAI API with the generated prompt
-getChatCompletion(prompt);
+  try {
+    // Generate the prompt based on user input
+    const prompt = generatePrompt(businessType, city, state, cuisine);
+
+    // Call OpenAI API with the generated prompt
+    const response = await getChatCompletion(prompt);
+
+    // Return the response
+    res.json({ response });
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+// Start the server
+app.listen(port, () => {
+  console.log(`Server running on http://localhost:${port}`);
+});
