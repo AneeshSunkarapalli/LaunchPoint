@@ -26,7 +26,7 @@ async function getChatCompletion(prompt, model = "gpt-4") {
     const response = await openai.chat.completions.create({
       model: model,
       messages: [{ role: "user", content: prompt }],
-      temperature: 0,
+      temperature: 0.5,
     });
 
     // Return the response

@@ -47,12 +47,32 @@ const Rating = () => {
     }
   };
 
+  // Function to fetch coordinates (latitude, longitude) from Google Geocoding API
+  const fetchCoordinates = async (location) => {
+    try {
+      const response = await axios.get(
+        `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(location)}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
+      );
+      
+      if (response.data.results.length > 0) {
+        const { lat, lng } = response.data.results[0].geometry.location;
+        return { lat, lng };
+      } else {
+        console.error("No results found for the location");
+        return { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco if no result
+      }
+    } catch (error) {
+      console.error("Error fetching coordinates:", error);
+      return { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco if error occurs
+    }
+  };
+
   // Function to render the map with markers
   const renderMap = () => (
     <GoogleMap
       mapContainerStyle={mapContainerStyle}
       zoom={12}
-      center={restaurants.length ? restaurants[0].geometry.location : { lat: 37.7749, lng: -122.4194 }} // Default to San Francisco
+      center={coordinates} // Use the fetched coordinates from Geocoding API
     >
       {restaurants.map((restaurant) => (
         <Marker key={restaurant.place_id} position={restaurant.geometry.location} />
@@ -84,6 +104,16 @@ const Rating = () => {
       },
     });
   };
+  
+  const [coordinates, setCoordinates] = useState({ lat: 37.7749, lng: -122.4194 }); // Default to San Francisco
+
+  useEffect(() => {
+    if (newLocation) {
+      fetchCoordinates(newLocation).then((coords) => {
+        setCoordinates(coords); // Update the map's center based on the coordinates
+      });
+    }
+  }, [newLocation]);
 
   useEffect(() => {
     if (initialLocation && !initialScore) {
