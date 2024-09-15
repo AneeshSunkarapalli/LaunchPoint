@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+import { useLocation } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api'; // Google Maps components
 import './Rating.css'; // Import your custom CSS
@@ -11,7 +11,6 @@ const mapContainerStyle = {
 
 const Rating = () => {
   const locationState = useLocation();
-  const navigate = useNavigate();
 
   const { location: initialLocation, category: initialCategory, subCategory: initialSubCategory, score: initialScore, factors: initialFactors } = locationState.state || {};
 
@@ -19,7 +18,7 @@ const Rating = () => {
   const [newCategory, setNewCategory] = useState(initialCategory || '');
   const [newSubCategory, setNewSubCategory] = useState(initialSubCategory || '');
   const [score, setScore] = useState(initialScore || 'Loading...');
-  const [factors, setFactors] = useState(initialFactors || ['Loading...', 'Loading...', 'Loading...', 'Loading...']);
+  const [factors, setFactors] = useState(initialFactors || ['Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...',  'Loading...',  'Loading...']);
   const [restaurants, setRestaurants] = useState([]); // To store restaurant data from Places API
 
   const { isLoaded } = useLoadScript({
@@ -27,25 +26,6 @@ const Rating = () => {
     libraries: ['places'], // Include the places library for Places API
   });
 
-  // Fetch American restaurants if the subCategory is "American"
-  useEffect(() => {
-    if (newSubCategory === 'American') {
-      const [city, state] = newLocation.split(',').map(part => part.trim());
-      fetchAmericanRestaurants(city, state); // Fetch restaurants if "American" is selected
-    }
-  }, [newSubCategory, newLocation]);
-
-  // Function to fetch American restaurants using the Google Places API
-  const fetchAmericanRestaurants = async (city, state) => {
-    try {
-      const response = await axios.get(
-        `https://maps.googleapis.com/maps/api/place/textsearch/json?query=American+restaurants+in+${city},${state}&key=${process.env.REACT_APP_GOOGLE_MAPS_API_KEY}`
-      );
-      setRestaurants(response.data.results); // Store the restaurant data in state
-    } catch (error) {
-      console.error('Error fetching American restaurants:', error);
-    }
-  };
 
   // Function to fetch coordinates (latitude, longitude) from Google Geocoding API
   const fetchCoordinates = async (location) => {
@@ -59,12 +39,12 @@ const Rating = () => {
         return { lat, lng };
       } else {
         console.error("No results found for the location");
-        return { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco if no result
+        return { lat: 37.2296, lng: -80.4139 }; 
       }
     } catch (error) {
       console.error("Error fetching coordinates:", error);
-      return { lat: 37.7749, lng: -122.4194 }; // Default to San Francisco if error occurs
-    }
+      return { lat: 37.2296, lng: -80.4139 };
+   }
   };
 
   // Function to render the map with markers
@@ -80,8 +60,17 @@ const Rating = () => {
     </GoogleMap>
   );
 
+  const [submittedLocation, setSubmittedLocation] = useState(initialLocation || '');
+  const [submittedCategory, setSubmittedCategory] = useState(initialCategory || '');
+  const [submittedSubCategory, setSubmittedSubCategory] = useState(initialSubCategory || '');
+
   const handleSearchSubmit = (e) => {
     e.preventDefault();
+
+    setSubmittedLocation(newLocation);
+    setSubmittedCategory(newCategory);
+    setSubmittedSubCategory(newSubCategory);
+
     const [city, state] = newLocation.split(',').map(part => part.trim());
 
     axios.post('http://localhost:3000/api/generate-business-score', {
@@ -95,17 +84,10 @@ const Rating = () => {
     }).catch(error => {
       console.error('Error fetching new score:', error);
     });
-
-    navigate('/results', {
-      state: {
-        location: newLocation,
-        category: newCategory,
-        subCategory: newSubCategory,
-      },
-    });
   };
   
-  const [coordinates, setCoordinates] = useState({ lat: 37.7749, lng: -122.4194 }); // Default to San Francisco
+  const [coordinates, setCoordinates] = useState({ lat: 37.2296, lng: -80.4139 }); // Default to Blacksburg, VA
+
 
   useEffect(() => {
     if (newLocation) {
@@ -163,7 +145,7 @@ const Rating = () => {
   const formatLocation = (location) => {
     if (!location || typeof location !== 'string' || !location.includes(',')) return ''; // Prevent errors if location is undefined or improperly formatted
     const [city, state] = location.split(',').map(part => part.trim());
-    return `${capitalizeWords(city)}, ${state.trim().toUpperCase()}`;
+    return `${capitalizeWords(city || '')}, ${state ? state.toUpperCase() : ''}`;
   };
   
 
@@ -221,7 +203,7 @@ const Rating = () => {
       <div className="results-content">
         {/* Left side: Map display */}
         <div className="map-container">
-          <h3>Map of American Restaurants</h3>
+          <h3>Map of Competing Businesses</h3>
           {isLoaded ? renderMap() : <div>Loading Map...</div>}
         </div>
 
