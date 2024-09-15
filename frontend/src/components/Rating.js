@@ -62,9 +62,8 @@ const Rating = () => {
 
   const handleSearchSubmit = (e) => {
     e.preventDefault();
-    const locationToUse = newLocation || initialLocation;
-    const [city, state] = locationToUse.split(',').map(part => part.trim());
-  
+    const [city, state] = newLocation.split(',').map(part => part.trim());
+
     axios.post('http://localhost:3000/api/generate-business-score', {
       city,
       state,
@@ -76,16 +75,15 @@ const Rating = () => {
     }).catch(error => {
       console.error('Error fetching new score:', error);
     });
-  
+
     navigate('/results', {
       state: {
-        location: newLocation, // Keep the newLocation
+        location: newLocation,
         category: newCategory,
         subCategory: newSubCategory,
       },
     });
   };
-  
 
   useEffect(() => {
     if (initialLocation && !initialScore) {
@@ -209,11 +207,11 @@ const Rating = () => {
           <div className="rating-factors">
             <div className="rating-factor">
               <h5>Competition</h5>
-              <p>{factors[1]}</p> {/* Changed to 0 */}
+              <p>{factors[1]}</p>
             </div>
             <div className="rating-factor">
               <h5>Popular Establishments</h5>
-              <p>{factors[3]}</p> {/* Changed to 1 */}
+              <p>{factors[3]}</p>
             </div>
             <div className="rating-factor">
               <h5>Demographics</h5>
@@ -221,7 +219,7 @@ const Rating = () => {
             </div>
             <div className="rating-factor">
               <h5>Socio-economic Conditions</h5>
-              <p>{factors[7]}</p> {/* Fixed the index issue */}
+              <p>{factors[7]}</p>
             </div>
           </div>
         </div>
