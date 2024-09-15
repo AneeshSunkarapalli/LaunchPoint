@@ -213,7 +213,7 @@ const Rating = () => {
       <div className="results-content">
         {/* Left side: Map display */}
         <div className="map-container">
-          <h3>Map of Competing Businesses</h3>
+          <h3>Map</h3>
           {isLoaded ? renderMap() : <div>Loading Map...</div>}
         </div>
 
