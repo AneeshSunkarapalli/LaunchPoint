@@ -131,10 +131,11 @@ const Rating = () => {
   };
 
   const formatLocation = (location) => {
-    if (!location || typeof location !== 'string') return ''; // Prevent errors if location is undefined
+    if (!location || typeof location !== 'string' || !location.includes(',')) return ''; // Prevent errors if location is undefined or improperly formatted
     const [city, state] = location.split(',').map(part => part.trim());
     return `${capitalizeWords(city)}, ${state.trim().toUpperCase()}`;
   };
+  
 
   const restaurantOptions = ['African', 'American', 'Chinese', 'Indian', 'Italian', 'Japanese', 'Korean', 'Mediterranean', 'Mexican', 'Middle Eastern', 'Thai'];
   const boutiqueOptions = ['Cafe/Bakery', 'Fashion/Apparel Retail', 'Grocery/Convenience', 'Health/Wellness'];
