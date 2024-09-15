@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 import axios from 'axios';
 import { GoogleMap, Marker, useLoadScript } from '@react-google-maps/api'; // Google Maps components
 import './Rating.css'; // Import your custom CSS
@@ -11,13 +11,18 @@ const mapContainerStyle = {
 
 const Rating = () => {
   const locationState = useLocation();
+  const navigate = useNavigate();
+
+  const handleHomeClick = () => {
+    navigate('/')
+  };
 
   const { location: initialLocation, category: initialCategory, subCategory: initialSubCategory, score: initialScore, factors: initialFactors } = locationState.state || {};
 
   const [newLocation, setNewLocation] = useState(initialLocation || '');
   const [newCategory, setNewCategory] = useState(initialCategory || '');
   const [newSubCategory, setNewSubCategory] = useState(initialSubCategory || '');
-  const [score, setScore] = useState(initialScore || 'Loading...');
+  const [score, setScore] = useState(initialScore || 'Loading...', 'Loading');
   const [factors, setFactors] = useState(initialFactors || ['Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...', 'Loading...',  'Loading...',  'Loading...']);
   const [restaurants, setRestaurants] = useState([]); // To store restaurant data from Places API
 
@@ -43,7 +48,7 @@ const Rating = () => {
       }
     } catch (error) {
       console.error("Error fetching coordinates:", error);
-      return { lat: 37.2296, lng: -80.4139 };
+      return { lat: 37.2296, lng: -80.4139 }; 
    }
   };
 
@@ -74,9 +79,9 @@ const Rating = () => {
     const [city, state] = newLocation.split(',').map(part => part.trim());
 
     axios.post('http://localhost:3000/api/generate-business-score', {
+      businessType: newCategory,
       city,
       state,
-      businessType: newCategory,
       cuisine: newSubCategory
     }).then(response => {
       setScore(response.data.score);
@@ -154,6 +159,11 @@ const Rating = () => {
 
   return (
     <div className="results-page">
+      <header className="rating-header">
+        <button className="home-button" onClick={handleHomeClick}>
+          Home
+        </button>
+      </header>
       <div className="search-bar-results">
         {/* Results Page Search Bar */}
         <form className="business-type" onSubmit={handleSearchSubmit}>

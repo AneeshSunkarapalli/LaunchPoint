@@ -16,7 +16,7 @@
   
   .search-bar-results button {
     padding: 8px 15px;
-    background-color: #007bff;
+    background-color: #000000;
     color: #fff;
     border: none;
     cursor: pointer;
@@ -24,6 +24,26 @@
   }
   
   .search-bar-results button:hover {
-    background-color: #0056b3;
+    background-color: #000000;
   }
   
+/* Ensure the button class is properly targeted */
+.search-bar-form .search-btn {
+  background-color: #000000; /* Primary blue color */
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  font-size: 16px;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.search-bar-form .search-btn:hover {
+  background-color: #616161; /* Darker blue on hover */
+}
+
+.search-bar-form .search-btn:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px rgba(0, 0, 0, 0.5);
+}
